@@ -1,6 +1,6 @@
 from enum import Enum
 
-with open("./7/input2.txt") as f:
+with open("./7/input.txt") as f:
     lines = f.read().strip().split('\n')
 # print(lines)
 
@@ -15,7 +15,7 @@ class File:
        self.size = size
 
     def __str__(self):
-        return f'{self.name}({self.type}) {self.size if self.size else ""}'
+        return f'{self.name}|{self.type}| - {self.size if self.size else ""}'
 
 
 class FileTreeNode:
@@ -25,38 +25,64 @@ class FileTreeNode:
         self.parent = parent
 
     def __str__(self):
-        return f'{self.value} <-- parent: {self.parent if self.parent else ""}'    
+        return f'{self.value} <-- parent: {self.parent.value if self.parent else ""}'    
 
     def add_child(self, child_node):
         self.children.append(child_node) 
         
-    def remove_child(self, child_node):
-        self.children = [child for child in self.children 
-                            if child is not child_node]
+    # def remove_child(self, child_node):
+    #     self.children = [child for child in self.children 
+    #                         if child is not child_node]
 
     def traverse(self):
         # moves through each node referenced from self downwards
         nodes_to_visit = [self]
         while len(nodes_to_visit) > 0:
             c = nodes_to_visit.pop()
-            print(c.value)
+            print(c)
             nodes_to_visit += c.children
 
     def get_child_by_value(self, value):
         children = self.children
         target_node = None
         for child in children:
-            print(child)
+            if child.value.name == value:
+                target_node = child
         return target_node
+    
+    def get_all_dirs(self):
+        # moves through each node referenced from self downwards
+        nodes_to_visit = [self]
+        dirs = []
+        while len(nodes_to_visit) > 0:
+            c = nodes_to_visit.pop()
+            if c.value.type == FileType.DIRECTORY:
+                dirs.append(c)
+            nodes_to_visit += c.children
+        return dirs
 
-def how_many_lines_to_next_dollar():
+    def calculate_size(self) -> int:
+        # recursively calculate size
+        size = 0
+        for child in self.children:
+            if child.value.type == FileType.DIRECTORY:
+                size += child.calculate_size()
+            else:
+                size += child.value.size
+        return size
+
+
+def how_many_lines_to_next_dollar_or_eof():
     # pop off the 'ls' line
     lines.pop()
     temp = list(reversed(lines))
     count = 0
+    # print(count,temp[0],len(temp))
     found = False
+    #
     while not found:
-        if temp[count][0] == '$':
+        # stop when reach $ or end of file
+        if count >= len(temp) or temp[count][0] == '$':
             found = True
             return count
         count += 1
@@ -85,13 +111,16 @@ while len(lines) > 0:
                 if not root:
                     root = FileTreeNode(File(name=line[2],t=FileType.DIRECTORY))
                     current_node = root
+                    print(f'setting the root node {current_node}')
                 else:
                     # need to get index of directory since it is already a node in the tree
+                    # print(f'running current_node.get_child_by_value(line[2]) {line[2]}')
                     current_node = current_node.get_child_by_value(line[2])
-                    current_node.add_child(FileTreeNode(File(name=line[2],t=FileType.DIRECTORY), parent=current_node))
+                    # this is not needed because we should have already created the directory
+                    # current_node.add_child(FileTreeNode(File(name=line[2],t=FileType.DIRECTORY), parent=current_node))
 
                 # create method for adding n nodes to the tree after the ls
-                n = how_many_lines_to_next_dollar()
+                n = how_many_lines_to_next_dollar_or_eof()
                 for i in range(n):
                     pos_one,pos_two = lines.pop().split(' ')
                     # add n nodes as children of the current_node
@@ -102,9 +131,22 @@ while len(lines) > 0:
                 # root.traverse()
             else:
                 # move up 1 directory
-                print(current_node)
-                print('moving up a dir')
                 current_node = current_node.parent
-                print(current_node)
+
+DISK_SPACE = 70000000
+SPACE_LEFT = DISK_SPACE - root.calculate_size()
+GOAL = 30000000
+
+lowest_dir_size = 0
+
+for dir in root.get_all_dirs():
+    size = dir.calculate_size()
+    print(f'dir:{dir} size:{size}')
+    if SPACE_LEFT + size >= GOAL:
+        if size < lowest_dir_size or lowest_dir_size == 0:
+            lowest_dir_size = size
 
 # root.traverse()
+# print(f'total size = {root.calculate_size()}')
+print(lowest_dir_size)
+print('\n\nfuck this fucking problem!')
