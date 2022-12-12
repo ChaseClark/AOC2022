@@ -161,7 +161,22 @@ class segment:
             pass # do nothing
         else:
             # special case for diagonal movement?
-            self.position = prev_segment_prev_position
+            if (abs(x_dif) > 1 and abs(y_dif) == 1): # diag horiz
+                # see if we have a next segment
+                if self.next_segment:
+                    pos = self.next_segment.position
+                else:
+                    self.position = prev_segment_prev_position
+            elif (abs(y_dif) > 1 and abs(x_dif) == 1): # diag vert
+                if self.next_segment:
+                    pos = self.next_segment.position
+                    dif = self.position.x - pos.x
+                    self.position.y += 1
+                    self.position.x += dif
+                else:
+                    self.position = prev_segment_prev_position
+            else:
+                self.position = prev_segment_prev_position
             moved = True
         # check if we have another segment to update
         # check if tail has visited this spot
