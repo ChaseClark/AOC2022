@@ -133,7 +133,8 @@ class rope:
             # print(self.head.prev_position)
             self.head.position.x += x 
             self.head.position.y += y
-            # print(f'|{dir}{i+1}| - H:{self.head.position}', end=' ')
+            print(f'|{dir}{i+1}| <--------------')
+            print(f'H:{self.head.position}')
             self.head.next_segment.update(self.head, prev_pos)
 
 
@@ -146,11 +147,12 @@ class segment:
         self.next_segment = next_segment
 
     def __str__(self) -> str:
-        return f'({self.position.x},{self.position.y})'
+        return f'{self.symbol}:({self.position.x},{self.position.y})'
 
     def update(self, prev_segment,prev_segment_prev_position) -> None:
         # tail move logic
         # if tail is overlapping or within 1 pos then dont move
+        moved = False
         x_dif = prev_segment.position.x - self.position.x
         y_dif = prev_segment.position.y - self.position.y
         prev_pos = position(self.position.x,self.position.y)
@@ -158,27 +160,35 @@ class segment:
         if abs(x_dif) <= 1 and abs(y_dif) <= 1:
             pass # do nothing
         else:
+            # special case for diagonal movement?
             self.position = prev_segment_prev_position
+            moved = True
         # check if we have another segment to update
         # check if tail has visited this spot
         
-        if self.next_segment:
-            # print('this node has another segment behind it!')
+        print(self)
+
+        if self.next_segment and moved:
+            # print('this node has another segment behind it!',self)
             self.next_segment.update(self,prev_pos)
 
         if self.symbol == '9':
             if not (str(self.position) in self.visited):
                 self.visited.append(str(self.position))
+                print('visited list updated!',self)
     
 r = rope()
-# r.move_head('R',4)
-# r.move_head('U',4)
+r.move_head('R',4)
+r.move_head('U',4)
+# r.move_head('L',8)
 
-for line in lines:
-    d,a = line.split(' ')
-    r.move_head(d,int(a))
+# for line in lines:
+#     d,a = line.split(' ')
+#     r.move_head(d,int(a))
 
+
+tail = r.head.next_segment.next_segment.next_segment.next_segment.next_segment.next_segment.next_segment.next_segment.next_segment
 # for seg in r.head.next_segment.visited:
 #     print(seg)
-print(len(r.head.next_segment.visited))
-print('fin')
+print()
+print(f'total tail_visited = {len(tail.visited)}')
