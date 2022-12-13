@@ -14,11 +14,11 @@ class Graph:
         self.graph = defaultdict(list)
  
     # function to add an edge to graph
-    def addEdge(self,u,v):
+    def add_edge(self,u,v):
         self.graph[u].append(v)
  
     # Function to print a BFS of graph
-    def BFS(self, s):
+    def bfs(self, s):
  
         # Mark all the vertices as not visited
         visited = [False] * (len(self.graph))
@@ -47,19 +47,46 @@ class Graph:
                     queue.append(i)
                     visited[i] = True
  
- 
-print ("Following is Breadth First Traversal"
-                  " (starting from vertex 2)")
 
 hills = {}
 starting_hill_location = None
+g = Graph()
+
 
 for r in range(len(lines)):
     for c in range(len(lines[0])):
         # add new entry to dict
-        hills[(r,c)] = list(lines[r][c])
-        if hills[(r,c)] == ['S']:
-            starting_hill_location = (r,c)
+        # hills[(r,c)] = list(lines[r][c])
+        u = (r,c,lines[r][c])
+        # check above
+        if r - 1 >= 0:
+            g.add_edge(u,(r-1,c,lines[r-1][c]))
+        # check below
+        if r + 1 < len(lines):
+            g.add_edge(u,(r+1,c,lines[r+1][c]))
+        # check left
+        if c - 1 >= 0:
+            g.add_edge(u,(r,c-1,lines[r][c-1]))
+        # check right
+        if c + 1 < len(lines[r]):
+            g.add_edge(u,(r,c+1,lines[r][c+1]))
 
-print(starting_hill_location)
+        #check left right up and down from node
+        # if hills[(r,c)] == ['S']:
+        #     starting_hill_location = (r,c,'S')
+        print(g.graph[u])
+
 # bfs
+
+# g = Graph()
+# g.addEdge(0, 1)
+# g.addEdge(0, 2)
+# g.addEdge(1, 2)
+# g.addEdge(2, 0)
+# g.addEdge(2, 3)
+# g.addEdge(3, 3)
+ 
+# print ("Following is Breadth First Traversal"
+#                   " (starting from vertex 2)")
+# g.BFS(2)
+ 
