@@ -1,39 +1,67 @@
-with open("./8/input2.txt") as f:
+with open("./8/input.txt") as f:
     lines = f.read().strip().split('\n')
-print(lines)
+# print(lines)
 
 l = len(lines)
 w = len(lines[0])
 
-total_visible = 0
+tree_map = {}
 
 print(f'processing {l} x {w} grid...')
-r=0
-c=0
-for line in lines:
-    # skip top and bottom row
-    if r == 0 or r == l-1:
-        r += 1
-        total_visible += len(line)
-        continue
-    c = 0
-    for char in line:
-        # skip first and last col
-        if c == 0 or c == w-1:
-            c += 1
-            total_visible += 1
+
+# loop through all inner rows and columns
+for r in range(l):
+
+    for c in range(w):
+        # check for perimiter nodes
+        if r == 0 or r == l - 1 or c == 0 or c == w - 1:
+            tree_map[(r,c)] = True
+            # stop processing further
             continue
-        # check if tblr are visible to edge
-        current = int(char)
-        visible_count = 0
-
-        # check left of char
-        # using a sublist
+        else:
+            tree_map[(r,c)] = False
+        height = int(lines[r][c])
         
+        # # check left
+        west_list = []
+        for i in lines[r][0:c]:
+            n = int(i)
+            west_list.append(n)
+
+        if max(west_list) < height:
+            tree_map[(r,c)] = True
 
 
-        # move on to next char
-        c += 1
-    r += 1
+        # # print(lines[r][c+1:w])
+        # # right
+        east_list = []
+        for i in lines[r][c+1:w]:
+            n = int(i)
+            east_list.append(n)
 
+        if max(east_list) < height:
+            tree_map[(r,c)] = True
+
+        # # north
+        north_list = []
+        for i in range(r):
+            n = int(lines[i][c])
+            north_list.append(n)
+        if max(north_list) < height:
+            tree_map[(r,c)] = True
+
+        # south
+        south_list = []
+        for i in range(r+1,l):
+            n = int(lines[i][c])
+            south_list.append(n)
+        if max(south_list) < height:
+            tree_map[(r,c)] = True
+
+
+        # for each node we need to check north south east west and 
+        # make sure each number in that direction is lower than current
+
+
+total_visible = len([t for t in tree_map.values() if t == True])
 print(total_visible)
