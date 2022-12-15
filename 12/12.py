@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-with open("./12/input.txt") as f:
+with open("./12/input2.txt") as f:
     lines = f.read().strip().split('\n')
 
 # This class represents a directed graph
@@ -45,7 +45,7 @@ class graph:
             # else we add new paths
             for next_node in next_nodes:
                 if not next_node in previous_nodes:
-                    new_path = current_path[:] # ?
+                    new_path = current_path.copy()
                     new_path.append(next_node)
                     paths.append(new_path)
                     # avoid backtracking
@@ -57,7 +57,7 @@ class graph:
         
 
 hills = {}
-starting_hill_location = None
+starting_hill_locations = []
 ending_hill_location = None
 g = graph()
 
@@ -65,9 +65,9 @@ g = graph()
 # dumb func to account for 'E's value
 def get_val_from_char(char) -> int:
     if char == 'E': 
-        return ord('z') + 1 # this needs to be the highest climbable val possible
+        return ord('z') # this needs to be the highest climbable val possible
     if char == 'S':
-        return ord('a') - 1 
+        return ord('a')
     else:
         return ord(char.lower())
 
@@ -94,28 +94,11 @@ for r in range(len(lines)):
             if get_val_from_char(lines[r][c]) >= get_val_from_char(lines[r][c+1]) - 1:
                 g.add_edge(u,f'{r} {c+1} {lines[r][c+1]}')
 
-        if lines[r][c] == 'S':
-            starting_hill_location = f'{r} {c} S'
+        if lines[r][c] == 'S' or 'a':
+            starting_hill_locations.append() f'{r} {c} S'
         if lines[r][c] == 'E':
             ending_hill_location = f'{r} {c} E'
         # print(f'u:{u} {g.graph[u]}')
 
-# bfs
-
-# g = Graph()
-# g.addEdge(0, 1)
-# g.addEdge(0, 2)
-# g.addEdge(1, 2)
-# g.addEdge(2, 0)
-# g.addEdge(2, 3)
-# g.addEdge(3, 3)
- 
-# print ("Following is Breadth First Traversal"
-#                   " (starting from vertex 2)")
-# g.BFS(2)
- 
-# print(len(g.graph))
-# g.bfs((0,0,'S'))
-
 p = g.shortest_path(starting_hill_location,ending_hill_location)
-print('result: ', p,len(p) - 1)
+# print('result: ', p,len(p) - 1)
