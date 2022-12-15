@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-with open("./12/input2.txt") as f:
+with open("./12/input.txt") as f:
     lines = f.read().strip().split('\n')
 
 # This class represents a directed graph
@@ -94,11 +94,22 @@ for r in range(len(lines)):
             if get_val_from_char(lines[r][c]) >= get_val_from_char(lines[r][c+1]) - 1:
                 g.add_edge(u,f'{r} {c+1} {lines[r][c+1]}')
 
-        if lines[r][c] == 'S' or 'a':
-            starting_hill_locations.append() f'{r} {c} S'
+        if lines[r][c] == 'S' or lines[r][c] == 'a':
+            starting_hill_locations.append(f'{r} {c} {lines[r][c]}') 
         if lines[r][c] == 'E':
             ending_hill_location = f'{r} {c} E'
         # print(f'u:{u} {g.graph[u]}')
 
-p = g.shortest_path(starting_hill_location,ending_hill_location)
-# print('result: ', p,len(p) - 1)
+# p = g.shortest_path(starting_hill_location,ending_hill_location)
+
+shortest_path = None
+for key in starting_hill_locations:
+    p = g.shortest_path(key,ending_hill_location)
+    distance = len(p) - 1
+    # print(p, distance)
+    print('---------')
+    if distance > 0 and (not shortest_path or distance < shortest_path):
+        print(distance)
+        shortest_path = distance
+
+print('result: ', shortest_path)
