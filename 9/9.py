@@ -107,6 +107,10 @@ class position:
 
 # class for rope that will keep track of pos of head and tail
 class rope:
+    grid_x = 25
+    grid_y = 25
+
+
     def __init__(self) -> None:
         # create a head and a link to the previous node
         self.head = segment(symbol='H',
@@ -123,6 +127,35 @@ class rope:
         # self.head = segment(symbol='H',
         # next_segment=segment(symbol='1'))
         # print(f'S:{self.head.position}', end=' ')
+        
+        self.grid = [ ['.'] * self.grid_x for _ in range(self.grid_y)]
+        # init our grid
+
+
+    def clear_grid(self):
+        self.grid = [ ['.'] * self.grid_x for _ in range(self.grid_y)]
+
+    def draw_grid(self):
+        # for row in self.grid:
+        #     for val in row:
+        #         print(val, end='')
+        for i in range(len(self.grid)-1,-1,-1):
+            for j in range(len(self.grid[i])):
+                print(self.grid[j][i], end='')
+            print()
+        print()
+
+    def draw_rope(self):
+        current = self.head
+        self.clear_grid()
+        while current.next_segment:
+            print(current)
+            self.grid[current.position.x][current.position.y] = current.symbol
+            current : segment = current.next_segment
+        print()
+        # one last time since there is no do while loop in python...
+        self.grid[current.position.x][current.position.y] = current.symbol
+        self.draw_grid()
 
     def move_head(self,dir: str, amount: int):
         x,y = dirs[dir]
@@ -133,9 +166,10 @@ class rope:
             # print(self.head.prev_position)
             self.head.position.x += x 
             self.head.position.y += y
-            print(f'|{dir}{i+1}| <--------------')
-            print(f'H:{self.head.position}')
+            # print(f'|{dir}{i+1}| <--------------')
+            # print(f'H:{self.head.position}')
             self.head.next_segment.update(self.head, prev_pos)
+            self.draw_rope()
 
 
 class segment:
@@ -160,28 +194,29 @@ class segment:
         if abs(x_dif) <= 1 and abs(y_dif) <= 1:
             pass # do nothing
         else:
-            # special case for diagonal movement?
-            if (abs(x_dif) > 1 and abs(y_dif) == 1): # diag horiz
-                # see if we have a next segment
-                if self.next_segment:
-                    pos = self.next_segment.position
-                else:
-                    self.position = prev_segment_prev_position
-            elif (abs(y_dif) > 1 and abs(x_dif) == 1): # diag vert
-                if self.next_segment:
-                    pos = self.next_segment.position
-                    dif = self.position.x - pos.x
-                    self.position.y += 1
-                    self.position.x += dif
-                else:
-                    self.position = prev_segment_prev_position
-            else:
-                self.position = prev_segment_prev_position
+            # # special case for diagonal movement?
+            # if (abs(x_dif) > 1 and abs(y_dif) == 1): # diag horiz
+            #     # see if we have a next segment
+            #     if self.next_segment:
+            #         pos = self.next_segment.position
+            #     else:
+            #         self.position = prev_segment_prev_position
+            # elif (abs(y_dif) > 1 and abs(x_dif) == 1): # diag vert
+            #     if self.next_segment:
+            #         pos = self.next_segment.position
+            #         dif = self.position.x - pos.x
+            #         self.position.y += 1
+            #         self.position.x += dif
+            #     else:
+            #         self.position = prev_segment_prev_position
+            # else:
+            #     self.position = prev_segment_prev_position
+            self.position = prev_segment_prev_position
             moved = True
         # check if we have another segment to update
         # check if tail has visited this spot
         
-        print(self)
+        # print(self)
 
         if self.next_segment and moved:
             # print('this node has another segment behind it!',self)
